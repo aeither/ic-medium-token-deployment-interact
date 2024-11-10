@@ -1,0 +1,26 @@
+(variant {Init = record {
+    token_symbol="Doge";
+    token_name="Doge";
+    decimals=opt 8;
+    transfer_fee=10;
+    metadata=vec {};
+    minting_account=record {
+        owner=principal "heqgv-7cfrx-l3fxg-5i4qa-3zh2i-idohp-v2lvi-ryj6p-snbq3-2f3op-qqe";
+        subaccount=null
+    };
+    initial_balances=vec {
+        record {
+            record {
+                owner=principal "heqgv-7cfrx-l3fxg-5i4qa-3zh2i-idohp-v2lvi-ryj6p-snbq3-2f3op-qqe";
+                subaccount=null
+            };
+            100_000_000_000_000  // 1,000,000 tokens with 8 decimals
+        }
+    };
+    archive_options=record {
+        num_blocks_to_archive=10_000;
+        trigger_threshold=20_000;
+        controller_id=principal "heqgv-7cfrx-l3fxg-5i4qa-3zh2i-idohp-v2lvi-ryj6p-snbq3-2f3op-qqe";
+        cycles_for_archive_creation=opt 4_000_000_000_000
+    }
+}})
