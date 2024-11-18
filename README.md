@@ -1,6 +1,6 @@
 # DOGE Token on Internet Computer
 
-script
+transfer
 
 ```bash
 dfx canister call doge_ledger_canister icrc1_transfer '(record {
@@ -11,6 +11,14 @@ dfx canister call doge_ledger_canister icrc1_transfer '(record {
 })' --network ic
 ```
 
+get transactions
+
+```bash
+dfx canister call doge_ledger_canister get_transactions '(record {
+    start = 0;
+    length = 10;
+})' --network ic
+```
 
 This project implements an ICRC-1 compliant token named "DOGE" on the Internet Computer, complete with ledger and index canisters for transaction management.
 
