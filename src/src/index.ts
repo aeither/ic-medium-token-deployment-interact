@@ -63,14 +63,17 @@ async function main() {
 
 		const index = IcrcIndexCanister.create({
 			agent,
-			canisterId: Principal.from(INDEX_CANISTER_ID),
+			canisterId: Principal.fromText(INDEX_CANISTER_ID),
 		});
 
 		const txs = await index.getTransactions({
 			max_results: BigInt(10),
-			account: { owner: Principal.fromText(INDEX_CANISTER_ID) },
+			account: {
+				owner: identity.getPrincipal(),
+				// subaccount: hexStringToUint8Array("0x0"),
+			},
 		});
-    console.log("Transactions: ", txs);
+		console.log("Transactions: ", txs);
 
 		// Check balance
 		const balance = await ledger.balance({
