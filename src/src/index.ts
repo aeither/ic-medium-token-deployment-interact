@@ -42,20 +42,46 @@ async function loadOrCreateIdentity(): Promise<Secp256k1KeyIdentity> {
 	return newIdentity;
 }
 
+// New function to monitor transactions
+async function monitorTransactions(
+	index: IcrcIndexCanister,
+	maxResults: number,
+	principal: Principal,
+	callback: (txs: any) => void,
+) {
+	let lastTxCount = 0;
+
+	// Check for new transactions every 5 seconds
+	setInterval(async () => {
+		try {
+			const txs = await index.getTransactions({
+				max_results: BigInt(maxResults),
+				account: {
+					owner: principal,
+				},
+			});
+
+			if (txs.transactions.length > lastTxCount) {
+				lastTxCount = txs.transactions.length;
+				callback(txs);
+			}
+		} catch (error) {
+			console.error("Error monitoring transactions:", error);
+		}
+	}, 5000);
+}
+
 async function main() {
 	try {
-		// Initialize identity
 		const identity = await loadOrCreateIdentity();
 		console.log("Principal ID:", identity.getPrincipal().toString());
 
-		// Create agent
 		const agent = await HttpAgent.create({
 			identity: identity,
 			host: LOCAL_HOST,
 		});
 		await agent.fetchRootKey();
 
-		// Create ledger interface
 		const ledger = IcrcLedgerCanister.create({
 			agent,
 			canisterId: Principal.from(LEDGER_CANISTER_ID),
@@ -66,16 +92,12 @@ async function main() {
 			canisterId: Principal.fromText(INDEX_CANISTER_ID),
 		});
 
-		const txs = await index.getTransactions({
-			max_results: BigInt(10),
-			account: {
-				owner: identity.getPrincipal(),
-				// subaccount: hexStringToUint8Array("0x0"),
-			},
+		// Start monitoring transactions
+		monitorTransactions(index, 1, identity.getPrincipal(), (txs) => {
+			console.log("New transactions detected:", txs);
 		});
-		console.log("Transactions: ", txs);
 
-		// Check balance
+		// Rest of your code remains the same
 		const balance = await ledger.balance({
 			owner: identity.getPrincipal(),
 		});
@@ -108,4 +130,5 @@ async function main() {
 	}
 }
 
-main();
+// Start the application but keep it running
+main().catch(console.error);
